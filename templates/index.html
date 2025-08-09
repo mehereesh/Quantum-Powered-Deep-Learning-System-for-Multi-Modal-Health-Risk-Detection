@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Health AI Classifier</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f0f4f8;
+    }
+    header {
+      background-color: #003366;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+    }
+    h1 {
+      margin-bottom: 10px;
+    }
+    .cards-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 40px;
+      margin-top: 30px;
+    }
+    .card {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      max-width: 300px;
+      text-align: center;
+      transition: 0.3s;
+    }
+    .card:hover {
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    }
+    .card img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+    .card button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #007acc;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .card button:hover {
+      background-color: #005999;
+    }
+    @media (max-width: 768px) {
+      .cards-container {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🧠🫀 Health AI Classifier</h1>
+    <p>Choose a model to classify medical images using AI</p>
+  </header>
+  <main>
+    <div class="cards-container">
+      <div class="card">
+        <img src="static/brain_preview.jpg" alt="Brain Tumor Classification">
+        <h2>Brain Tumor Detection</h2>
+        <p>Classify brain MRI scans to detect tumors: Glioma, Meningioma, Pituitary, or Normal.</p>
+        <button onclick="window.location.href='brain'">Go to Brain Classifier</button>
+      </div>
+      <div class="card">
+        <img src="static/heart_preview.jpg" alt="ECG Classification">
+        <br>
+        <h2>Heart ECG Classification</h2>
+        <p>Analyze ECG images to predict cardiac conditions like MI, Abnormal, History of MI, or Normal.</p>
+        <button onclick="window.location.href='heart'">Go to Heart Classifier</button>
+      </div>
+    </div>
+
+  <section style="max-width: 700px; margin-top: 50px; background: #fff; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.08); padding: 30px;">
+    <h2>About the Project</h2>
+    <h3>Brain Tumor Classification</h3>
+    <p>
+      This project leverages both Quantum Machine Learning (QML) and Classical Deep Learning (DL) models to classify brain MRI images and detect tumors. We used raw MRI image data for training, ensuring the model learns directly from authentic medical scans. The Pennylane library was utilized to simulate quantum circuits and extract features using quantum convolutional layers. TensorFlow/Keras enabled us to build and train classical models such as DenseNet121, as well as hybrid models that combine quantum and classical layers. Data management was handled with pandas, while OpenCV (cv2) and matplotlib supported image processing and visualization. The dataset was loaded using h5py, and scikit-learn facilitated train-test splitting and performance evaluation. Our hybrid quantum-classical model achieved a high accuracy of 94%, with detailed insights provided by the classification report and confusion matrix. This project demonstrates how quantum and deep learning technologies can work together to advance medical image classification.
+    </p>
+
+    <h3>Heart ECG Classification</h3>
+    <p>
+      In this project, we developed a highly accurate cardiovascular disease detection system by combining Deep Learning and Quantum Machine Learning (QML) to classify ECG images into four categories, including myocardial infarction and other abnormal heart conditions. The backbone of our model is EfficientNetB0, a lightweight yet powerful deep neural network that efficiently extracts meaningful features from ECG images. To boost performance, we integrated a Quantum Layer using Pennylane, which introduces quantum computation principles like superposition and entanglement to better capture complex data patterns. The hybrid architecture significantly improved both training speed and classification precision. With images resized to 64x64 pixels, the model achieved a weighted F1-score of 0.9917, while for high-resolution 255x255 images, it reached a near-perfect F1-score of 0.9986 with 100% accuracy on most classes. This approach demonstrates the power of combining quantum-enhanced learning with deep neural networks for fast, reliable, and scalable ECG-based heart disease detection.
+    </p>
+  
+  </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Heart ECG Detection</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            padding: 0;
+            margin: 0;
+            background: linear-gradient(120deg, #e0eafc 0%, #cfdef3 100%);
+        }
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 32px 24px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(44,62,80,0.12);
+        }
+        h2 {
+            text-align: center;
+            color: #2d3e50;
+            margin-bottom: 24px;
+            letter-spacing: 1px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        input[type="file"] {
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #bfc9d4;
+            background: #f4f8fb;
+            width: 100%;
+            max-width: 350px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 28px;
+            border: none;
+            border-radius: 6px;
+            background: linear-gradient(90deg, #4e54c8 0%, #8f94fb 100%);
+            color: #fff;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.08);
+        }
+        button:hover {
+            background: linear-gradient(90deg, #8f94fb 0%, #4e54c8 100%);
+            box-shadow: 0 4px 16px rgba(44,62,80,0.16);
+        }
+        .image-preview {
+            margin: 24px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 24px;
+            background: #f4f8fb;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.06);
+        }
+        .image-preview:hover {
+            box-shadow: 0 4px 16px rgba(44,62,80,0.12);
+        }
+        img {
+            max-width: 180px;
+            height: auto;
+            border-radius: 10px;
+            border: 2px solid #e0eafc;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.08);
+        }
+        .result {
+            font-weight: bold;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 0 0 0 16px;
+            font-size: 16px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.04);
+        }
+        .green {
+            background: #d4edda;
+            color: #155724;
+            border-left: 6px solid #28a745;
+        }
+        .orange {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 6px solid #fd7e14;
+        }
+        .red {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 6px solid #dc3545;
+        }
+        .default {
+            background: #dee2e6;
+            color: #343a40;
+            border-left: 6px solid #6c757d;
+        }
+        h3 {
+            color: #4e54c8;
+            margin-top: 0;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        p {
+            margin: 6px 0;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>❤️ Heart ECG Image Classification</h2>
+    <form id="upload-form" method="post" enctype="multipart/form-data">
+        <div id="drop-area">
+            <p>Drag & Drop ECG images here<br>or</p>
+            <input type="file" id="fileElem" name="images" multiple required>
+            <label for="fileElem" class="button">Browse Files</label>
+        </div>
+        <button type="submit">Upload & Predict</button>
+    </form>
+
+    {% if results %}
+        <h3>Results for {{ count }} Image(s)</h3>
+        <p style="text-align:center;">Total Time: {{ total_time }} sec</p>
+
+        <!-- Category Filter -->
+        <div style="text-align:center; margin-bottom:18px;">
+            <label for="category-filter" style="font-weight:600; color:#4e54c8;">Filter by Category:</label>
+            <select id="category-filter" style="padding:6px 12px; border-radius:6px; border:1px solid #bfc9d4; font-size:15px;">
+                <option value="All">All</option>
+                <option value="Normal">Normal</option>
+                <option value="Abnormal">Abnormal</option>
+                <option value="Myocardial Infarction">Myocardial Infarction</option>
+            </select>
+        </div>
+
+        <div class="results-grid" id="results-grid">
+        {% for result in results %}
+            <div class="image-preview" data-category="{{ result.label }}">
+                <img class="preview-img" src="{{ url_for('static', filename='uploads/' ~ result.filename) }}">
+                <div class="filename">{{ result.filename }}</div>
+                <div class="result 
+                    {% if result.label == 'Normal' %}green
+                    {% elif result.label == 'Abnormal' %}orange
+                    {% elif result.label == 'Myocardial Infarction' %}red
+                    {% else %}default
+                    {% endif %}
+                ">
+                    <p class="result-details"><strong>Prediction:</strong> {{ result.label }}</p>
+                    <p class="result-details"><strong>Confidence:</strong> {{ result.confidence }}</p>
+                    <p class="result-details"><strong>Time:</strong> {{ result.elapsed }}</p>
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+
+        <script>
+        // Filter logic
+        document.getElementById('category-filter').addEventListener('change', function() {
+            const selected = this.value;
+            document.querySelectorAll('#results-grid .image-preview').forEach(function(item) {
+                if (selected === 'All' || item.getAttribute('data-category') === selected) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+        </script>
+    {% endif %}
+
+    <script>
+        const dropArea = document.getElementById('drop-area');
+        const fileInput = document.getElementById('fileElem');
+
+        dropArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropArea.classList.add('highlight');
+        });
+
+        dropArea.addEventListener('dragleave', () => {
+            dropArea.classList.remove('highlight');
+        });
+
+        dropArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropArea.classList.remove('highlight');
+            fileInput.files = e.dataTransfer.files;
+        });
+    </script>
+    <style>
+        #drop-area {
+            border: 2px dashed #8f94fb;
+            border-radius: 12px;
+            padding: 32px 24px;
+            text-align: center;
+            background: #f4f8fb;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            margin-bottom: 18px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.06);
+        }
+        #drop-area.highlight {
+            border-color: #4e54c8;
+            box-shadow: 0 4px 16px rgba(44,62,80,0.12);
+            background: #e0eafc;
+        }
+        #drop-area p {
+            font-size: 17px;
+            color: #4e54c8;
+            margin-bottom: 12px;
+        }
+        #fileElem {
+            display: none;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 24px;
+            border-radius: 6px;
+            background: linear-gradient(90deg, #4e54c8 0%, #8f94fb 100%);
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 8px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.08);
+            border: none;
+            text-decoration: none;
+            transition: background 0.2s, box-shadow 0.2s;
+        }
+        .button:hover {
+            background: linear-gradient(90deg, #8f94fb 0%, #4e54c8 100%);
+            box-shadow: 0 4px 16px rgba(44,62,80,0.16);
+        }
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 32px;
+            margin-top: 24px;
+        }
+        .image-preview {
+            background: #f4f8fb;
+            border-radius: 12px;
+            padding: 18px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.06);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: box-shadow 0.2s;
+        }
+        .image-preview:hover {
+            box-shadow: 0 4px 16px rgba(44,62,80,0.12);
+        }
+        .preview-img {
+            max-width: 240px;
+            max-height: 180px;
+            width: auto;
+            height: auto;
+            border-radius: 10px;
+            border: 2px solid #e0eafc;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.08);
+            margin-bottom: 10px;
+            background: #fff;
+        }
+        .filename {
+            font-size: 15px;
+            color: #4e54c8;
+            margin-bottom: 8px;
+            word-break: break-all;
+            text-align: center;
+        }
+        .result {
+            font-weight: bold;
+            padding: 14px 12px;
+            border-radius: 8px;
+            font-size: 16px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.04);
+            width: 100%;
+            margin-top: 8px;
+        }
+        .green {
+            background: #d4edda;
+            color: #155724;
+            border-left: 6px solid #28a745;
+        }
+        .orange {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 6px solid #fd7e14;
+        }
+        .red {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 6px solid #dc3545;
+        }
+        .default {
+            background: #dee2e6;
+            color: #343a40;
+            border-left: 6px solid #6c757d;
+        }
+        .result-details {
+            margin: 0;
+            font-size: 15px;
+            font-weight: normal;
+        }
+    </style>
+</div>
+</body>
+</html>

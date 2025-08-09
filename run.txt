@@ -1,0 +1,18 @@
+Python : https://www.python.org/downloads/release/python-3100/
+vs code : https://code.visualstudio.com/download
+Install both
+Open Vs code 
+open folder or Drag & Drop folder 
+Open terminal (CTRL + Shift + `)
+
+paste the commnad in terminal
+
+1. python -m venv env
+2. env\Scripts\activate
+3. pip install -r requirements.txt
+4. python app.py
+
+You will have link in terminal copy and paste in Browser (Chrome , edge, firefox etc...)
+http://127.0.0.1:5000/index
+http://127.0.0.1:5000/brain
+http://127.0.0.1:5000/heart

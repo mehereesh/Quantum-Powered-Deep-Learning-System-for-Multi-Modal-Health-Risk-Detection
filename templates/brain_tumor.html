@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Brain Tumor Detection</title>
+    <style>
+
+    body {
+        font-family: 'Segoe UI', Arial, sans-serif;
+        padding: 0;
+        margin: 0;
+        background: linear-gradient(120deg, #e0eafc 0%, #cfdef3 100%);
+    }
+    .container {
+        max-width: 800px;
+        margin: 40px auto;
+        background: #fff;
+        padding: 32px 24px;
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(44,62,80,0.12);
+    }
+    h2 {
+        text-align: center;
+        color: #2d3e50;
+        margin-bottom: 24px;
+        letter-spacing: 1px;
+    }
+    form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 32px;
+    }
+    input[type="file"] {
+        padding: 8px;
+        border-radius: 6px;
+        border: 1px solid #bfc9d4;
+        background: #f4f8fb;
+        width: 100%;
+        max-width: 350px;
+        font-size: 16px;
+    }
+    button {
+        padding: 10px 28px;
+        border: none;
+        border-radius: 6px;
+        background: linear-gradient(90deg, #4e54c8 0%, #8f94fb 100%);
+        color: #fff;
+        font-size: 17px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s, box-shadow 0.2s;
+        box-shadow: 0 2px 8px rgba(44,62,80,0.08);
+    }
+    button:hover {
+        background: linear-gradient(90deg, #8f94fb 0%, #4e54c8 100%);
+        box-shadow: 0 4px 16px rgba(44,62,80,0.16);
+    }
+    .image-preview {
+        margin: 24px 0;
+        display: flex;
+        align-items: flex-start;
+        gap: 24px;
+        background: #f4f8fb;
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 2px 8px rgba(44,62,80,0.06);
+        transition: box-shadow 0.2s;
+    }
+    .image-preview:hover {
+        box-shadow: 0 4px 16px rgba(44,62,80,0.12);
+    }
+    img {
+        max-width: 180px;
+        height: auto;
+        border-radius: 10px;
+        border: 2px solid #e0eafc;
+        box-shadow: 0 2px 8px rgba(44,62,80,0.08);
+    }
+    .result {
+        font-weight: bold;
+        padding: 16px;
+        border-radius: 8px;
+        margin: 0 0 0 16px;
+        font-size: 16px;
+        box-shadow: 0 2px 8px rgba(44,62,80,0.04);
+    }
+    .green {
+        background: #d4edda;
+        color: #155724;
+        border-left: 6px solid #28a745;
+    }
+    .red {
+        background: #f8d7da;
+        color: #721c24;
+        border-left: 6px solid #dc3545;
+    }
+    h3 {
+        color: #4e54c8;
+        margin-top: 0;
+        margin-bottom: 8px;
+        text-align: center;
+    }
+    p {
+        margin: 6px 0;
+    }
+</style>
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>🧠 Brain Tumor Detection</h2>
+    <form id="upload-form" method="post" enctype="multipart/form-data">
+        <div id="drop-area" class="drop-area">
+            <input type="file" id="fileElem" name="images" multiple accept="image/*" style="display:none" required>
+            <div class="drop-text">
+                <svg width="48" height="48" fill="#4e54c8" viewBox="0 0 24 24"><path d="M12 16v-8m0 0l-4 4m4-4l4 4M20 16.58A5.42 5.42 0 0 0 14.58 11H14V9a4 4 0 0 0-8 0v2H5.42A5.42 5.42 0 0 0 4 16.58C4 19.09 6.13 21 8.75 21h6.5C17.87 21 20 19.09 20 16.58z"/></svg>
+                <p>Drag & drop images here<br>or</p>
+                <button type="button" id="browseBtn" class="upload-btn">Browse Files</button>
+            </div>
+            <div id="file-list" class="file-list"></div>
+        </div>
+        <button type="submit" class="predict-btn">Upload & Predict</button>
+    </form>
+    <style>
+    .drop-area {
+        border: 2px dashed #8f94fb;
+        border-radius: 14px;
+        background: #f4f8fb;
+        padding: 36px 24px;
+        text-align: center;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        margin-bottom: 24px;
+        position: relative;
+    }
+    .drop-area.dragover {
+        border-color: #4e54c8;
+        box-shadow: 0 4px 16px rgba(44,62,80,0.12);
+        background: #e0eafc;
+    }
+    .drop-text svg {
+        margin-bottom: 12px;
+    }
+    .upload-btn {
+        background: linear-gradient(90deg, #4e54c8 0%, #8f94fb 100%);
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        padding: 10px 22px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 10px;
+        box-shadow: 0 2px 8px rgba(44,62,80,0.08);
+        transition: background 0.2s, box-shadow 0.2s;
+    }
+    .upload-btn:hover {
+        background: linear-gradient(90deg, #8f94fb 0%, #4e54c8 100%);
+        box-shadow: 0 4px 16px rgba(44,62,80,0.16);
+    }
+    .file-list {
+        margin-top: 18px;
+        text-align: left;
+        font-size: 15px;
+        color: #2d3e50;
+    }
+    .file-list span {
+        display: inline-block;
+        background: #e0eafc;
+        border-radius: 6px;
+        padding: 6px 12px;
+        margin: 4px 4px 0 0;
+        font-weight: 500;
+    }
+    .predict-btn {
+        width: 100%;
+        margin-top: 12px;
+        padding: 12px 0;
+        font-size: 18px;
+        border-radius: 8px;
+        background: linear-gradient(90deg, #4e54c8 0%, #8f94fb 100%);
+        color: #fff;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(44,62,80,0.08);
+        transition: background 0.2s, box-shadow 0.2s;
+    }
+    .predict-btn:hover {
+        background: linear-gradient(90deg, #8f94fb 0%, #4e54c8 100%);
+        box-shadow: 0 4px 16px rgba(44,62,80,0.16);
+    }
+    /* Improved result card */
+    .result-card {
+        display: flex;
+        align-items: flex-start;
+        gap: 24px;
+        background: #f4f8fb;
+        border-radius: 14px;
+        padding: 18px 20px;
+        box-shadow: 0 2px 12px rgba(44,62,80,0.08);
+        margin-bottom: 24px;
+        transition: box-shadow 0.2s;
+        border-left: 8px solid #4e54c8;
+    }
+    .result-card.green {
+        border-left: 8px solid #28a745;
+        background: #eafaf1;
+    }
+    .result-card.red {
+        border-left: 8px solid #dc3545;
+        background: #faeaea;
+    }
+    .result-details {
+        flex: 1;
+        padding-left: 10px;
+    }
+    .result-details h4 {
+        margin: 0 0 8px 0;
+        font-size: 17px;
+        color: #4e54c8;
+        font-weight: 600;
+        word-break: break-all;
+    }
+    .result-details .prediction {
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 6px;
+    }
+    .result-details .confidence {
+        font-size: 15px;
+        margin-bottom: 4px;
+    }
+    .result-details .elapsed {
+        font-size: 14px;
+        color: #888;
+    }
+    </style>
+    <script>
+    const dropArea = document.getElementById('drop-area');
+    const fileElem = document.getElementById('fileElem');
+    const browseBtn = document.getElementById('browseBtn');
+    const fileList = document.getElementById('file-list');
+
+    browseBtn.onclick = () => fileElem.click();
+
+    fileElem.onchange = () => {
+        showFiles(fileElem.files);
+    };
+
+    dropArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropArea.classList.add('dragover');
+    });
+    dropArea.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        dropArea.classList.remove('dragover');
+    });
+    dropArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropArea.classList.remove('dragover');
+        const files = e.dataTransfer.files;
+        fileElem.files = files;
+        showFiles(files);
+    });
+
+    function showFiles(files) {
+        fileList.innerHTML = '';
+        if (files.length === 0) return;
+        for (let i = 0; i < files.length; i++) {
+            const span = document.createElement('span');
+            span.textContent = files[i].name;
+            fileList.appendChild(span);
+        }
+    }
+    </script>
+
+    {% if results %}
+        <h3>Results for {{ count }} Image(s)</h3>
+        <p>Total Time: {{ total_time }} sec</p>
+        {% for result in results %}
+            <div class="result-card {% if 'No Tumor' in result.label %}green{% else %}red{% endif %}">
+                <img src="{{ url_for('static', filename='uploads/' ~ result.filename) }}" alt="{{ result.filename }}">
+                <div class="result-details">
+                    <h4>{{ result.filename }}</h4>
+                    <div class="prediction">
+                        <strong>Prediction:</strong> {{ result.label }}
+                    </div>
+                    <div class="confidence">
+                        <strong>Confidence:</strong> {{ result.confidence }}
+                    </div>
+                    <div class="elapsed">
+                        <strong>Time:</strong> {{ result.elapsed }}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+</body>
+</html>
